@@ -1,0 +1,74 @@
+body {
+    font-family: 'Press Start 2P', cursive;
+    color: #FFB000;
+    background-color: #000000;
+    /* font-family: "Arial", Gadget, sans-serif; */
+    font-size: 1.17em;
+}
+
+h1, h2 {
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+body {
+    min-width: 768px;
+}
+
+button {
+    font-family: 'Press Start 2P', cursive;
+    /* font-family: "Arial", Gadget, sans-serif; */
+    margin: 1px 1px 1px 1px;
+    border: 1px solid #FFB000;
+    /* border-radius: 5px;  */
+    background-color: #FFC000;
+    color: #000;
+    font-size: 1.25em;
+}
+
+#navbar {
+    height: 20%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#center {
+    width: 50%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-content: center;
+    padding: 2em 0 0 0 ;
+}
+
+#title {
+    margin: .67em 0 .67em 0;
+    text-align: center;
+}
+
+#choices {
+    margin-bottom: 1em;
+}
+
+.answer-question {
+    margin: 0;
+    font-size: 1.25em;
+    /* font-family: "Arial", Gadget, sans-serif; */
+    font-family: 'Press Start 2P', cursive;
+    font-weight: bold;
+}
+
+.justify-left {
+    margin: auto auto auto 0;
+    text-align: left;
+}
+
+.justify-center {
+    margin: auto 0 auto 0;
+    text-align: center;
+}
