@@ -117,13 +117,13 @@ class TimeProvider extends React.Component {
 
         switch (action.type) {
             case ADD_SCORE:
-                this.setState((state) => ({
-                    ...state,
-                    quiz: {
-                        ...state.quiz,
+                this.setState((state) => {
+                    console.log(action.payload)
+                    return {
+                        ...state,
                         highscores: [...state.highscores, action.payload]
-                    }
-                }));
+                    };
+                });
                 break;
             case START_QUIZ:
                 console.log("START_QUIZ");
@@ -154,7 +154,7 @@ class TimeProvider extends React.Component {
                 if (this.state.quiz.questionIndex >= questions.length - 1) {
                     // next question will be out of range, set to stopped
                     clearInterval(this.handle);
-                    this.handle = null;    
+                    this.handle = null;
                     this.setState(stopState);
                 }
                 else {

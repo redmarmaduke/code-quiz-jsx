@@ -3,19 +3,19 @@ import { Link } from 'react-router-dom';
 
 import Title from '../components/Title';
 
-import { useGameContext } from '../components/GameProvider';
+import { useTimeContext } from '../components/TimeProvider';
 
 function Highscores() {
-    var [scores, dispatch] = useGameContext();
+    var [{ highscores }, dispatch] = useTimeContext();
     return (
         <div>
             <Title>HighGame</Title>
             <div className="justify-center">
                 <ul style={{ width: "100%", listStyleType: "none" }}>
-                    {scores.map((score, i) => {
+                    {highscores.map((score, i) => {
                         return (<li className="justify-left" key={i} style={{ width: "100%", backgroundColor: "lavender" }}>
                             <p style={{ width: "100%", padding: "0.25em", margin: "0.125em" }}>
-                                {(i + 1).toString().concat(". ", score.getInitials(), " - ", score.getScore())}
+                                {(i + 1).toString().concat(". ", score.initials, " - ", score.score)}
                             </p>
                         </li>);
                     })}
