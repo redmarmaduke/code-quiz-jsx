@@ -1,12 +1,10 @@
 import React from 'react';
 
-const IS_STARTED = "isStarted";
-const IS_STOPPED = "isStopped";
-const IS_PAUSED = "isPaused";
+const ADD_SCORE = "addScore";
 
-const START_TIME = "startTime";
-const PAUSE_TIME = "pauseTime";
-const STOP_TIME = "stopTime";
+const START_QUIZ = "startQuiz";
+const STOP_QUIZ = "stopQuiz";
+const NEXT_QUESTION = "nextQuestion";
 const SET_INTERVAL_CALLBACK = "setIntervalCallback";
 const SET_TIMEOUT_CALLBACK = "setTimeoutCallback";
 const SET_TIME = "setTime";
@@ -19,6 +17,35 @@ const GET_TIME = "getTime";
 const GET_INTERVAL = "getInterval";
 const GET_TIMEOUT = "getTimeout";
 
+var questions = [
+    {
+        title: "Commonly used data types DO NOT include:",
+        choices: ["strings", "booleans", "alerts", "numbers"],
+        answer: 2
+    },
+    {
+        title: "The condition in an if else statement is enclosed within _______?",
+        choices: ["quotes", "curly brackets", "parenthesis", "square brackets"],
+        answer: 2
+    },
+    {
+        title: "Arrays in JavaScript can be used to store _______.",
+        choices: ["numbers and strings", "other arrays", "booleans", "all of the above"],
+        answer: 3
+    },
+    {
+        title: "String values must be enclosed within  _______ when being assigned to variables.",
+        choices: ["commas", "curly brackets", "quotes", "parenthesis"],
+        answer: 2
+    },
+    {
+        title: "A very useful tool used during development and debugging for printing content to the debugger is:",
+        choices: ["JavaScript", "terminal / bash", "for loops", "console.log"],
+        answer: 3
+    }
+];
+
+
 var TimeContext = React.createContext([0]);
 
 class TimeProvider extends React.Component {
@@ -27,121 +54,146 @@ class TimeProvider extends React.Component {
 
         this.props = props;
         this.state = {
-            time: 30
+            quiz: {
+                is: { stopped: true },
+                time: 30,
+                question: null,
+                questionIndex: 0
+            },
+            highscores: []
         };
+
         this.timeout = 30;
-        this.interval = 1;
-        this.handle = undefined;
+        this.handle = null;
         this.timeoutCallback = () => { };
         this.intervalCallback = () => { };
+        this.questionIndex = 0;
     }
 
     dispatch(action) {
         function callback() {
-            console.log(window.location.pathname);
-            if (window.location.pathname !== '/quiz') {
+            if (window.location.pathname !== '/quiz' || (this.state.quiz.is.started && this.state.quiz.time <= 1)) {
+                console.log("CLEAR", this.handle);
                 clearInterval(this.handle);
-                this.handle = undefined;
-                this.setState({ time: 0 });
-            } 
-            else if(this.state.time <= this.interval) {
-                clearInterval(this.handle);
-                this.handle = undefined;
+                this.handle = null;
 
                 this.timeoutCallback();
-                this.setState({ time: (this.state.time <= this.interval) ? 0 : this.state.time - this.interval });
+                this.setState((state) => {
+                    return {
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            is: { stopped: true },
+                            question: null,
+                            time: 0
+                        }
+                    };
+                });
             }
             else {
                 this.intervalCallback();
-                this.setState({ time: this.state.time - this.interval });
+                this.setState((state) => (
+                    {
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            time: state.quiz.time - 1
+                        }
+                    }
+                ));
             }
-        };
+        }
+
+        function stopState(state) {
+            return {
+                ...this.state,
+                quiz: {
+                    ...this.state.quiz,
+                    is: { stopped: true },
+                    question: null
+                }
+            };
+        }
 
         switch (action.type) {
-            case START_TIME:
+            case ADD_SCORE:
+                this.setState((state) => ({
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        highscores: [...state.highscores, action.payload]
+                    }
+                }));
+                break;
+            case START_QUIZ:
+                console.log("START_QUIZ");
                 // if handle exists ignore start
-                if (this.handle) {
-                    return this.state.time;
+                if (this.handle !== null) {
+                    return;
                 }
-                this.handle = setInterval(callback.bind(this), this.interval * 1000);
-                return this.state.time;
-            case STOP_TIME:
-                if (!this.handle && !this.state.time) {
-                    return 0;
+                this.handle = setInterval(callback.bind(this), 1000);
+                this.setState((state) => ({
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        is: { started: true },
+                        time: 30,
+                        question: questions[0]
+                    }
+                }));
+                break;
+            case STOP_QUIZ:
+                if (this.handle === null && this.state.time === 0) {
+                    return;
                 }
                 clearInterval(this.handle);
-                this.handle = undefined;
-                this.setState({ time: 0 });
-                return this.state.time;
-            case PAUSE_TIME:
-                clearInterval(this.handle);
-                this.handle = undefined;
-                return this.state.time;
-            case IS_STARTED:
-                return this.handle && this.state.time;
-            case IS_STOPPED:
-                return !this.handle && !this.state.time;
-            case IS_PAUSED:
-                return !this.handle && this.state.time;
+                this.handle = null;
+                this.setState(stopState);
+                break;
+            case NEXT_QUESTION:
+                if (this.state.quiz.questionIndex >= questions.length - 1) {
+                    // next question will be out of range, set to stopped
+                    clearInterval(this.handle);
+                    this.handle = null;    
+                    this.setState(stopState);
+                }
+                else {
+                    // set question to next question
+                    this.setState((state) => ({
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            question: questions[state.quiz.questionIndex + 1],
+                            questionIndex: state.quiz.questionIndex + 1
+                        }
+                    }));
+                }
+                break;
             case SET_TIME:
-                {
-                    let time = this.state.time;
-                    if (typeof action.payload === 'number') {
-                        if (action.payload < 0) {
-                            // immediately take appropriate actions time time has been set to 0
-                            callback.bind(this)();
-                            this.setState({ time: 0 });
+                if (typeof action.payload === 'number') {
+                    // immediately take appropriate actions time time has been set to 0
+                    callback.bind(this)();
+                    this.setState((state) => ({
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            time: action.payload < 0 ? 0 : action.payload
                         }
-                        else {
-                            this.setState({ time: action.payload });
-                        }
-                    }
-                    return time;
+                    }));
                 }
+                break;
             case SET_INTERVAL_CALLBACK:
-                {
-                    let intervalCallback = this.intervalCallback;
-                    if (typeof action.payloud === 'function') {
-                        this.intervalCallback = action.payload;
-                    }
-                    return intervalCallback;
+                if (typeof action.payloud === 'function') {
+                    this.intervalCallback = action.payload;
                 }
+                break;
             case SET_TIMEOUT_CALLBACK:
-                {
-                    let timeoutCallback = this.timeoutCallback;
-                    if (typeof action.payloud === 'function') {
-                        this.timeoutCallback = action.payload;
-                    }
-                    return timeoutCallback;
+                if (typeof action.payloud === 'function') {
+                    this.timeoutCallback = action.payload;
                 }
-            case SET_INTERVAL:
-                {
-                    let interval = this.interval;
-                    if (typeof action.payload === 'number') {
-                        this.interval = action.payload;
-                    }
-                    return interval;
-                }
-            case SET_TIMEOUT:
-                {
-                    let timeout = this.timeout;
-                    if (typeof action.payload === 'number') {
-                        this.timeout = action.payload;
-                    }
-                    return timeout;
-                }
-            case GET_TIME:
-                return this.state.time;
-            case GET_INTERVAL_CALLBACK:
-                return this.intervalCallback;
-            case GET_TIMEOUT_CALLBACK:
-                return this.timeoutCallback;
-            case GET_INTERVAL:
-                return this.interval;
-            case GET_TIMEOUT:
-                return this.timeout;
+                break;
             default:
-                return undefined;
+                break;
         }
     }
 
@@ -162,19 +214,17 @@ var Time = function (props) {
     return (
         <div>
             <TimeContext.Consumer>
-                {([{ time }]) => <div>Time: {time}</div>}
+                {([{ quiz: { time } }]) => <div>Time: {time}</div>}
             </TimeContext.Consumer>
         </div>);
 }
 
 export {
     TimeProvider, useTimeContext, Time,
-    IS_STARTED,
-    IS_STOPPED,
-    IS_PAUSED,
-    START_TIME,
-    PAUSE_TIME,
-    STOP_TIME,
+    ADD_SCORE,
+    START_QUIZ,
+    STOP_QUIZ,
+    NEXT_QUESTION,
     SET_INTERVAL_CALLBACK,
     SET_TIMEOUT_CALLBACK,
     SET_TIME,
