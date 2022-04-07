@@ -9,7 +9,7 @@ function Highscores() {
     var [{ highscores }, dispatch] = useTimeContext();
     return (
         <div>
-            <Title>HighGame</Title>
+            <Title>High Scores</Title>
             <div className="justify-center">
                 <ul style={{ width: "100%", listStyleType: "none" }}>
                     {highscores.map((score, i) => {

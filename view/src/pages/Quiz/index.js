@@ -14,7 +14,6 @@ function Quiz(props) {
     }, []);
 
     return (
-
         <div>
             {
                 quiz.is.started ? <NavBar showTime /> : <NavBar />

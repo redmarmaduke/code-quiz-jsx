@@ -23,7 +23,7 @@ function GameOver() {
                 alignContent: "center",
                 padding: "2em 0 0 0"
             }}>
-                <Title>Game Over!</Title>
+            <Title>Game Over!</Title>
                 {
                     quiz.time > 0 ?
                         <>
@@ -52,33 +52,7 @@ function GameOver() {
                         </>
                 }
             </div>
-        );
-    /*
-    <Title>Your final score is: {quiz.time} </Title>
-    <label htmlFor="initials_input">Enter initials:</label>
-    <input id="initials_input" type="text" ref={ref} style={{ marginBottom: "0.5em" }} onChange={() => {
-        ref.current.value = ref.current.value.toUpperCase().replace(/[^A-Z]/g, "").substr(0, 3);
-    }} />
-    <button style={{ fontSize: "1em" }} onClick={() => {
-        dispatchGame({ type: "add", score: new Score(ref.current.value, score) });
-        setRedirect(true);
-        dispatch({ type: STOP_TIME });
-        setQuestionIndex(0);
-    }}>Submit</button>
-</> :
-    <>
-        <Title>Game Over!</Title>
-        <Link to="/" style={{
-            display: "flex",
-            justifyContent: "center"
-        }}>
-            <button onClick={() => {
-                console.log("Go Back!");
-            }} className='justify-center' style={{ padding: "0px" }}>
-                Go Back
-            </button>
-        </Link>
-    </>); */
+    );
 }
 
 export default GameOver;
