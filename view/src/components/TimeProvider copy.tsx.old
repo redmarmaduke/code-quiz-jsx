@@ -1,0 +1,345 @@
+import React from "react";
+import {
+    ADD_SCORE,
+    START_QUIZ,
+    STOP_QUIZ,
+    NEXT_QUESTION,
+    SET_INTERVAL_CALLBACK,
+    SET_TIMEOUT_CALLBACK,
+    SET_TIME,
+    SET_INTERVAL,
+    SET_TIMEOUT,
+    GET_INTERVAL_CALLBACK,
+    GET_TIMEOUT_CALLBACK,
+    GET_TIME,
+    GET_INTERVAL,
+    GET_TIMEOUT,
+} from "./TimeProvider.js";
+
+import useInterval from './useInterval.js';
+
+import type { TimeProviderHighscore, TimeProviderState, TimeProviderDispatchAction } from './TimeProvider.js';
+
+const questions = [
+    {
+        title: "Commonly used data types DO NOT include:",
+        choices: ["strings", "booleans", "alerts", "numbers"],
+        answer: 2,
+    },
+    {
+        title: "The condition in an if else statement is enclosed within _______?",
+        choices: ["quotes", "curly brackets", "parenthesis", "square brackets"],
+        answer: 2,
+    },
+    {
+        title: "Arrays in JavaScript can be used to store _______.",
+        choices: [
+            "numbers and strings",
+            "other arrays",
+            "booleans",
+            "all of the above",
+        ],
+        answer: 3,
+    },
+    {
+        title:
+            "String values must be enclosed within  _______ when being assigned to variables.",
+        choices: ["commas", "curly brackets", "quotes", "parenthesis"],
+        answer: 2,
+    },
+    {
+        title:
+            "A very useful tool used during development and debugging for printing content to the debugger is:",
+        choices: ["JavaScript", "terminal / bash", "for loops", "console.log"],
+        answer: 3,
+    },
+];
+
+function getStopState(state: TimeProviderState) {
+    return {
+        ...state,
+        quiz: {
+            ...state.quiz,
+            is: { stopped: true },
+            question: null,
+        },
+    };
+}
+
+function reducer(state: TimeProviderState, action: TimeProviderDispatchAction) : TimeProviderState {
+    switch (action.type) {
+        case ADD_SCORE:
+            let highscore = action.payload as TimeProviderHighscore;
+            console.log("ADD_SCORE", highscore);
+            return {
+                ...state,
+                highscores: [...state.highscores, highscore],
+            };
+        case START_QUIZ:
+            console.log("START_QUIZ", action.payload);
+            return {
+                ...state,
+                quiz: {
+                    ...state.quiz,
+                    is: { stopped: false },
+                    time: 30,
+                    question: questions[0],
+                },
+            };
+        case STOP_QUIZ:
+            console.log("STOP QUIZ");
+            return {
+                ...state,
+                quiz: {
+                    ...state.quiz,
+                    is: { stopped: true },
+                    time: 0,
+                    question: null,
+                    questionIndex: -1,
+                },
+            };
+        case NEXT_QUESTION:
+            // if end of quiz the end
+            if (state.quiz.questionIndex >= questions.length - 1) {
+                return {
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        is: { stopped: true },
+                        time: 0,
+                        question: null,
+                        questionIndex: -1,
+                    },
+                };
+                // else increment question
+            } else {
+                return {
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        question: questions[state.quiz.questionIndex + 1],
+                        questionIndex: state.quiz.questionIndex + 1,
+                    },
+                };
+            }
+        case SET_TIME:
+            if (typeof action.payload === "number") {
+                // immediately take appropriate action if time has been set to 0
+                return {
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        time: action.payload < 0 ? 0 : action.payload,
+                    },
+                };
+            }
+            return state;
+        default:
+            return state;
+    }
+};
+
+const TimeContext = React.createContext<[TimeProviderState?,React.Dispatch<TimeProviderDispatchAction>?]>([]);
+
+function TimeProvider(props: React.PropsWithChildren) {
+    const clearInterval = useInterval(() => {
+
+    }, 1000);
+    const [state, setState] = React.useReducer<
+    (state: TimeProviderState, action: TimeProviderDispatchAction) => TimeProviderState>(reducer, {
+        quiz: {
+            is: { stopped: true },
+            time: 0,
+            question: null,
+            questionIndex: 0,
+        },
+        highscores: [],
+    })
+
+    return (
+        <TimeContext.Provider value={[state, setState]}>
+
+        </TimeContext.Provider>
+    );
+}
+
+class TimeProvider2 extends React.Component {
+    constructor(props: any) {
+        super(props);
+
+        this.props = props;
+        this.state : TimeProviderState = {
+            quiz: {
+                is: { stopped: true },
+                time: 30,
+                question: null,
+                questionIndex: 0,
+            },
+            highscores: [],
+        };
+
+        this.timeout = 30;
+        this.handle = null;
+        this.timeoutCallback = () => { };
+        this.intervalCallback = () => { };
+        this.questionIndex = 0;
+    }
+
+    dispatch(action) {
+        function callback() {
+            if (
+                window.location.pathname !== "/quiz" ||
+                (this.state.quiz.is.started && this.state.quiz.time <= 1)
+            ) {
+                console.log("CLEAR", this.handle);
+                clearInterval(this.handle);
+                this.handle = null;
+
+                this.timeoutCallback();
+                this.setState((state) => {
+                    return {
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            is: { stopped: true },
+                            question: null,
+                            time: 0,
+                        },
+                    };
+                });
+            } else {
+                this.intervalCallback();
+                this.setState((state) => ({
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        time: state.quiz.time - 1,
+                    },
+                }));
+            }
+        }
+
+        function stopState(state) {
+            return {
+                ...this.state,
+                quiz: {
+                    ...this.state.quiz,
+                    is: { stopped: true },
+                    question: null,
+                },
+            };
+        }
+
+        switch (action.type) {
+            case ADD_SCORE:
+                this.setState((state) => {
+                    console.log(action.payload);
+                    return {
+                        ...state,
+                        highscores: [...state.highscores, action.payload],
+                    };
+                });
+                break;
+            case START_QUIZ:
+                console.log("START_QUIZ");
+                // if handle exists ignore start
+                if (this.handle !== null) {
+                    return;
+                }
+                this.handle = setInterval(callback.bind(this), 1000);
+                this.setState((state) => ({
+                    ...state,
+                    quiz: {
+                        ...state.quiz,
+                        is: { started: true },
+                        time: 30,
+                        question: questions[0],
+                    },
+                }));
+                break;
+            case STOP_QUIZ:
+                if (this.handle === null && this.state.time === 0) {
+                    return;
+                }
+                clearInterval(this.handle);
+                this.handle = null;
+                this.setState(stopState);
+                break;
+            case NEXT_QUESTION:
+                if (this.state.quiz.questionIndex >= questions.length - 1) {
+                    // next question will be out of range, set to stopped
+                    clearInterval(this.handle);
+                    this.handle = null;
+                    this.setState(stopState);
+                } else {
+                    // set question to next question
+                    this.setState((state) => ({
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            question: questions[state.quiz.questionIndex + 1],
+                            questionIndex: state.quiz.questionIndex + 1,
+                        },
+                    }));
+                }
+                break;
+            case SET_TIME:
+                if (typeof action.payload === "number") {
+                    // immediately take appropriate actions time time has been set to 0
+                    callback.bind(this)();
+                    this.setState((state) => ({
+                        ...state,
+                        quiz: {
+                            ...state.quiz,
+                            time: action.payload < 0 ? 0 : action.payload,
+                        },
+                    }));
+                }
+                break;
+            case SET_INTERVAL_CALLBACK:
+                if (typeof action.payloud === "function") {
+                    this.intervalCallback = action.payload;
+                }
+                break;
+            case SET_TIMEOUT_CALLBACK:
+                if (typeof action.payloud === "function") {
+                    this.timeoutCallback = action.payload;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    render() {
+        return (
+            <TimeContext.Provider value={[this.state, this.dispatch.bind(this)]}>
+                {this.props.children}
+            </TimeContext.Provider>
+        );
+    }
+}
+
+const useTimeContext = function () {
+    return React.useContext(TimeContext);
+};
+
+const Time = function (props) {
+    return (
+        <div>
+            <TimeContext.Consumer>
+                {([
+                    {
+                        quiz: { time },
+                    },
+                ]) => <div>Time: {time}</div>}
+            </TimeContext.Consumer>
+        </div>
+    );
+};
+
+export default TimeProvider;
+export {
+    useTimeContext,
+    Time,
+};
