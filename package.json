@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Quiz Game",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d view/dist",
     "start:prod": "cd view && npm start",
     "start:dev": "cd view && npm run dev",
     "start": "if-env NODE_ENV=\"production\" && npm run start:prod || npm run start:dev",
@@ -14,5 +16,8 @@
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "if-env": "^1.0.4"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
   }
 }

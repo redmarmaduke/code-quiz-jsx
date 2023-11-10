@@ -1,13 +1,9 @@
-import React from 'react';
-
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
-
-import Title from "../../components/Title";
 
 import { SET_TIME, NEXT_QUESTION } from "../../components/TimeProvider.d";
 import { useTimeContext } from "../../components/TimeProvider";

@@ -8,7 +8,6 @@ import useInterval from "../../components/useInterval";
 
 import { START_QUIZ, STOP_QUIZ, DECREMENT_TIME } from "../../components/TimeProvider.d";
 import { useTimeContext } from "../../components/TimeProvider";
-import { QuizSharp } from "@mui/icons-material";
 
 function Quiz() {
   const [{ quiz }, dispatch] = useTimeContext();
