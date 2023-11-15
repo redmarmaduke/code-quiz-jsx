@@ -30,7 +30,7 @@ npm install
 
 ## Deployed Link
 
-* [TBD](#)
+* [Deployed Site](https://redmarmaduke.github.io/code-quiz-jsx/)
 
 ## Authors
 
