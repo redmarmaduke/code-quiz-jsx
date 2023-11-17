@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Quiz Game",
   "scripts": {
+    "install": "cd view && npm install",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d view/dist",
     "start:prod": "cd view && npm start",
