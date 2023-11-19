@@ -26,17 +26,22 @@ export type TimeProviderDispatchAction = {
 };
 
 export type TimeProviderQuestion = {
-  title: string;
+  type: "list"|"confirm"|"checkbox";
+  message: string;
   choices: string[];
-  answer: number;
+  name: string;
+  default?: string | number | boolean;
+  answer: string | number | boolean | (string | number | boolean)[];
+};
+
+export type TimeProviderStateQuiz = {
+  is: { stopped: boolean };
+  time: number;
+  question: TimeProviderQuestion | null;
+  questionIndex: number;
 };
 
 export type TimeProviderState = {
-  quiz: {
-    is: { stopped: boolean };
-    time: number;
-    question: TimeProviderQuestion | null;
-    questionIndex: number;
-  };
+  quiz: TimeProviderStateQuiz;
   highscores: TimeProviderHighscore[];
 };

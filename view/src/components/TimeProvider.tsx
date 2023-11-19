@@ -16,17 +16,20 @@ import type {
 
 const questions = [
   {
-    title: "Commonly used data types DO NOT include:",
+    type: "list",
+    message: "Commonly used data types DO NOT include:",
     choices: ["strings", "booleans", "alerts", "numbers"],
     answer: 2,
   },
   {
-    title: "The condition in an if else statement is enclosed within _______?",
+    type: "list",
+    message: "The condition in an if else statement is enclosed within _______?",
     choices: ["quotes", "curly brackets", "parenthesis", "square brackets"],
     answer: 2,
   },
   {
-    title: "Arrays in JavaScript can be used to store _______.",
+    type: "list",
+    message: "Arrays in JavaScript can be used to store _______.",
     choices: [
       "numbers and strings",
       "other arrays",
@@ -36,13 +39,15 @@ const questions = [
     answer: 3,
   },
   {
-    title:
+    type: "list",
+    message:
       "String values must be enclosed within  _______ when being assigned to variables.",
     choices: ["commas", "curly brackets", "quotes", "parenthesis"],
     answer: 2,
   },
   {
-    title:
+    type: "list",
+    message:
       "A very useful tool used during development and debugging for printing content to the debugger is:",
     choices: ["JavaScript", "terminal / bash", "for loops", "console.log"],
     answer: 3,
