@@ -28,7 +28,7 @@ export type TimeProviderDispatchAction = {
 export type TimeProviderQuestion = {
   type: "list"|"confirm"|"checkbox";
   message: string;
-  choices: string[];
+  choices?: string[];
   name: string;
   default?: string | number | boolean;
   answer: string | number | boolean | (string | number | boolean)[];

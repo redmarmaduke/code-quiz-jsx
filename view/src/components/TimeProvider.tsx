@@ -12,20 +12,38 @@ import type {
   TimeProviderHighscore,
   TimeProviderState,
   TimeProviderDispatchAction,
+  TimeProviderQuestion,
 } from "./TimeProvider.d";
 
-const questions = [
+const questions : TimeProviderQuestion[] = [
+  {
+    type: "confirm",
+    message:
+      "Yes or No (Hint Yes):",
+    answer: true,
+    name: "yesorno",
+  },
+  {
+    type: "checkbox",
+    message:
+      "You must choose A and B:",
+    choices: ["A", "B", "C"],
+    answer: ["A","B"],
+    name: "checkbox",
+  },
   {
     type: "list",
     message: "Commonly used data types DO NOT include:",
     choices: ["strings", "booleans", "alerts", "numbers"],
     answer: 2,
+    name: "q1",
   },
   {
     type: "list",
     message: "The condition in an if else statement is enclosed within _______?",
     choices: ["quotes", "curly brackets", "parenthesis", "square brackets"],
     answer: 2,
+    name: "q2",
   },
   {
     type: "list",
@@ -37,6 +55,7 @@ const questions = [
       "all of the above",
     ],
     answer: 3,
+    name: "q3",
   },
   {
     type: "list",
@@ -44,6 +63,7 @@ const questions = [
       "String values must be enclosed within  _______ when being assigned to variables.",
     choices: ["commas", "curly brackets", "quotes", "parenthesis"],
     answer: 2,
+    name: "q4",
   },
   {
     type: "list",
@@ -51,6 +71,22 @@ const questions = [
       "A very useful tool used during development and debugging for printing content to the debugger is:",
     choices: ["JavaScript", "terminal / bash", "for loops", "console.log"],
     answer: 3,
+    name: "q5",
+  },
+  {
+    type: "confirm",
+    message:
+      "Yes or No (Hint Yes):",
+    answer: true,
+    name: "q6",
+  },
+  {
+    type: "checkbox",
+    message:
+      "You must choose A and B:",
+    choices: ["A", "B", "C"],
+    answer: ["A","B"],
+    name: "q7",
   },
 ];
 

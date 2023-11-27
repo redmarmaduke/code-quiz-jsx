@@ -13,7 +13,6 @@ function Quiz() {
   const [{ quiz }, dispatch] = useTimeContext();
 
   const clearInterval = useInterval(() => {
-    console.log(quiz);
     if (quiz.time < 1) {
       clearInterval();
       dispatch({ type: STOP_QUIZ });

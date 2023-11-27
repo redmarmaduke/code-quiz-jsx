@@ -16,12 +16,12 @@ import React from "react";
 // confirm Y/N
 // checkbox any of many
 
-type AnswerValue = string | number | boolean | undefined;
-type AnswerType = AnswerValue | AnswerValue[];
+type AnswerValue = string | number | boolean;
+type AnswerType = AnswerValue | AnswerValue[] | undefined;
 
 type AnswerProps = React.PropsWithChildren & {
   question?: TimeProviderQuestion;
-  onAnswer?: (answer: { [key:string]: AnswerType}) => void;
+  onAnswer?: (answer: { [key: string]: AnswerType }) => void;
 };
 
 function ListAnswers({ question, onAnswer }: AnswerProps) {
@@ -37,7 +37,7 @@ function ListAnswers({ question, onAnswer }: AnswerProps) {
         name="list-controlled-radio-buttons-group"
         value={question?.default}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          onAnswer?.({[question?.name]: e.target.value});
+          onAnswer?.({ [question?.name]: e.target.value });
         }}
       >
         {question?.choices.map(function (choice, index) {
@@ -61,8 +61,10 @@ function ConfirmAnswers({ question, onAnswer }: AnswerProps) {
         aria-labelledby="confirm-question"
         name="confirm-controlled-radio-buttons-group"
         value={question?.default}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-          onAnswer?.({[question?.name]: e.target.value === "true"})}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onAnswer?.({ [question?.name]: e.target.value === "true" })
+        }
+        }
       >
         {[true, false].map(function (answer, index) {
           return (
@@ -77,10 +79,10 @@ function ConfirmAnswers({ question, onAnswer }: AnswerProps) {
 function CheckboxAnswers({ question, onAnswer }: AnswerProps) {
   const [answers, setAnswers] = React.useState({});
 
-  if (!question) {
+  if (!question?.choices) {
     return <></>;
   }
-  
+
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnswers({
       ...answers,
@@ -89,36 +91,39 @@ function CheckboxAnswers({ question, onAnswer }: AnswerProps) {
   };
 
   return (
-    <FormControl>
-      <FormLabel id="checkbox-question">{question?.message ?? "ERROR: Question missing."}</FormLabel>
-      <FormGroup
-        aria-labelledby="checkbox-question"
-      >
-        {question?.choices.map(function (choice, index) {
-          return (
-            <FormControlLabel key={index} control={<Checkbox onChange={changeHandler} name={choice}/>} label={choice} />
-          );
-        })}
-      </FormGroup>
-      <Button type="submit" onSubmit={(event: React.FormEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-        const answerArray = Object.entries(answers).filter(([, value]) => !!value).map(([key]) => key);
-        onAnswer?.({[question.name]: answerArray});
-      }}>Submit</Button>
-    </FormControl>
+    <form onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      const answerArray = Object.entries(answers).filter(([, value]) => !!value).map(([key]) => key);
+      console.log("submit button", answerArray);
+      onAnswer?.({ [question.name]: answerArray });
+    }}>
+      <FormControl>
+        <FormLabel id="checkbox-question">{question?.message ?? "ERROR: Question missing."}</FormLabel>
+        <FormGroup
+          aria-labelledby="checkbox-question"
+        >
+          {question?.choices?.map(function (choice, index) {
+            return (
+              <FormControlLabel key={index} control={<Checkbox onChange={changeHandler} name={choice} />} label={choice} />
+            );
+          })}
+        </FormGroup>
+        <Button type="submit">Submit</Button>
+      </FormControl>
+    </form>
   );
 }
 
 function Question() {
   const [{ quiz }, dispatch] = useTimeContext();
-
   if (!quiz.question) {
     return <></>;
   }
 
   let component: JSX.Element;
 
-  const name : string = quiz.question?.name;
+  const name: string = quiz.question?.name;
 
   switch (quiz.question?.type) {
     case "list":
@@ -134,6 +139,7 @@ function Question() {
     case "confirm":
       component = (
         <ConfirmAnswers question={quiz.question} onAnswer={(answer) => {
+          console.log(answer[name], name, quiz.question?.answer);
           if (answer[name] !== quiz.question?.answer) {
             dispatch({ type: SET_TIME, payload: quiz.time - 10 });
           }
@@ -144,34 +150,33 @@ function Question() {
     case "checkbox":
       component = (
         <CheckboxAnswers question={quiz.question} onAnswer={(answer) => {
-          const sortCallback = (a : AnswerValue,b: AnswerValue) => {
-            if (a === b) {
-              return 0;
-            }
-            if (typeof a === 'undefined') {
-              return -1;
-            }
-            else if (typeof b === 'undefined') {
-              return 1;
-            }
-            return a.toString().localeCompare(b.toString());
+          const sortCallback = (a: AnswerValue, b: AnswerValue) => {
+            return JSON.stringify(a).localeCompare(JSON.stringify(b));
           };
 
-          const answerArray = answer[name] instanceof Array ? answer[name].sort(sortCallback);
-          const referenceArray = (quiz.question?.answer as AnswerValue[]).sort(sortCallback);
-          const isSame = answerArray.every((value, index) => {
-            return referenceArray[index] = value;
+          const userAnswers: AnswerValue[] = answer[name] && answer[name] instanceof Array ? answer[name] as AnswerValue[] : [];
+          if (userAnswers.length === 0) {
+            console.error("checkbox")
+          }
+          userAnswers.sort(sortCallback);
+
+          const referenceAnswers = (quiz.question?.answer as AnswerValue[]).sort(sortCallback)
+          // determine if all the checkboxes match?
+          const isCorrect = userAnswers.every((value, index) => {
+            return referenceAnswers[index] == value;
           });
 
-          if (!isSame) {
+          // if all checkboxes do not match (ie. is not correct)
+          // then penalize time
+          if (!isCorrect) {
             dispatch({ type: SET_TIME, payload: quiz.time - 10 });
           }
           dispatch({ type: NEXT_QUESTION });
-        }}/>
+        }} />
       );
       break;
     default:
-      component = <></>;
+      component = <>Malformed Question Object.</>;
   }
 
   return (
