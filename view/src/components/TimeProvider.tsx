@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   ADD_SCORE,
   START_QUIZ,
@@ -6,14 +6,14 @@ import {
   NEXT_QUESTION,
   SET_TIME,
   DECREMENT_TIME,
-} from "./TimeProvider.d";
+} from './TimeProvider.d';
 
 import type {
   TimeProviderHighscore,
   TimeProviderState,
   TimeProviderDispatchAction,
   TimeProviderQuestion,
-} from "./TimeProvider.d";
+} from './TimeProvider.d';
 
 const questions : TimeProviderQuestion[] = [
 /*  {
@@ -32,107 +32,117 @@ const questions : TimeProviderQuestion[] = [
     name: "checkbox",
   }, */
   {
-    type: "list",
-    message: "Commonly used data types DO NOT include:",
-    choices: ["strings", "booleans", "alerts", "numbers"],
+    type: 'list',
+    message: 'Commonly used data types DO NOT include:',
+    choices: ['strings', 'booleans', 'alerts', 'numbers'],
     answer: 2,
-    name: "q1",
+    name: 'q1',
   },
   {
-    type: "list",
-    message: "The condition in an if else statement is enclosed within _______?",
-    choices: ["quotes", "curly brackets", "parenthesis", "square brackets"],
+    type: 'list',
+    // eslint-disable-next-line max-len
+    message: 'The condition in an if else statement is enclosed within _______?',
+    choices: ['quotes', 'curly brackets', 'parenthesis', 'square brackets'],
     answer: 2,
-    name: "q2",
+    name: 'q2',
   },
   {
-    type: "list",
-    message: "Arrays in JavaScript can be used to store _______.",
+    type: 'list',
+    message: 'Arrays in JavaScript can be used to store _______.',
     choices: [
-      "numbers and strings",
-      "other arrays",
-      "booleans",
-      "all of the above",
+      'numbers and strings',
+      'other arrays',
+      'booleans',
+      'all of the above',
     ],
     answer: 3,
-    name: "q3",
+    name: 'q3',
   },
   {
-    type: "list",
+    type: 'list',
     message:
-      "String values must be enclosed within  _______ when being assigned to variables.",
-    choices: ["commas", "curly brackets", "quotes", "parenthesis"],
+      // eslint-disable-next-line max-len
+      'String values must be enclosed within  _______ when being assigned to variables.',
+    choices: ['commas', 'curly brackets', 'quotes', 'parenthesis'],
     answer: 2,
-    name: "q4",
+    name: 'q4',
   },
   {
-    type: "list",
+    type: 'list',
     message:
-      "A very useful tool used during development and debugging for printing content to the debugger is:",
-    choices: ["JavaScript", "terminal / bash", "for loops", "console.log"],
+    // eslint-disable-next-line max-len
+      'A very useful tool used during development and debugging for printing content to the debugger is:',
+    choices: ['JavaScript', 'terminal / bash', 'for loops', 'console.log'],
     answer: 3,
-    name: "q5",
+    name: 'q5',
   },
   {
-    type: "confirm",
+    type: 'confirm',
     message:
-      "Yes or No (Hint Yes):",
+      'Yes or No (Hint Yes):',
     answer: true,
-    name: "q6",
+    name: 'q6',
   },
   {
-    type: "checkbox",
+    type: 'checkbox',
     message:
-      "You must choose A and B:",
-    choices: ["A", "B", "C"],
-    answer: ["A","B"],
-    name: "q7",
+      'You must choose A and B:',
+    choices: ['A', 'B', 'C'],
+    answer: ['A', 'B'],
+    name: 'q7',
   },
 ];
 
+/**
+ * Reducer
+ *
+ * @param {TimeProviderState} state
+ * @param {TimeProviderDispatchAction} action
+ * @return {TimeProviderState}
+ */
 function reducer(
-  state: TimeProviderState,
-  action: TimeProviderDispatchAction
+    state: TimeProviderState,
+    action: TimeProviderDispatchAction,
 ): TimeProviderState {
   const stopQuiz = (state : TimeProviderState) => ({
-      ...state,
-      quiz: {
-        ...state.quiz,
-        is: { stopped: true },
-        question: null,
-        questionIndex: -1,
-      }
+    ...state,
+    quiz: {
+      ...state.quiz,
+      is: {stopped: true},
+      question: null,
+      questionIndex: -1,
+    },
   });
 
   switch (action.type) {
     case ADD_SCORE: {
       const highscore = action.payload as TimeProviderHighscore;
-      console.log("ADD_SCORE", highscore);
+      console.log('ADD_SCORE', highscore);
       return {
         ...state,
         highscores: [...state.highscores, highscore],
       };
     }
     case START_QUIZ:
-      console.log("START_QUIZ");
+      console.log('START_QUIZ');
       if (!state.quiz.is.stopped) {
-        console.log("Already started!");
+        console.log('Already started!');
         return state;
       }
       return {
         ...state,
         quiz: {
           ...state.quiz,
-          is: { stopped: false },
+          is: {stopped: false},
           time: 30,
           question: questions[0],
         },
       };
     case STOP_QUIZ:
-      console.log("STOP QUIZ");
+      console.log('STOP QUIZ');
       return stopQuiz(state);
     case NEXT_QUESTION:
-      console.log("NEXT QUESTION");
+      console.log('NEXT QUESTION');
       // if end of quiz the end
       if (state.quiz.questionIndex >= questions.length - 1) {
         return stopQuiz(state);
@@ -148,7 +158,7 @@ function reducer(
         };
       }
     case DECREMENT_TIME:
-      console.log("DECREMENT_TIME");
+      console.log('DECREMENT_TIME');
       // if time then increment time
       if (state.quiz.time > 0) {
         return {
@@ -157,14 +167,13 @@ function reducer(
             ...state.quiz,
             time: state.quiz.time - 1,
           },
-        };  
-      }
-      // else if time <= 0 then stop quiz
-      else {
+        };
+      } else {
+        // else if time <= 0 then stop quiz
         return stopQuiz(state);
       }
-  case SET_TIME:
-      if (typeof action.payload === "number") {
+    case SET_TIME:
+      if (typeof action.payload === 'number') {
         // immediately take appropriate action if time has been set to 0
         return {
           ...state,
@@ -182,7 +191,7 @@ function reducer(
 
 const initialState: TimeProviderState = {
   quiz: {
-    is: { stopped: true },
+    is: {stopped: true},
     time: 30,
     question: null,
     questionIndex: 0,
@@ -194,13 +203,17 @@ const TimeContext = React.createContext<
   [TimeProviderState, React.Dispatch<TimeProviderDispatchAction>]
 >([initialState, () => null]);
 
+/**
+ * Time Provider
+ * @param {React.PropsWithChildren} props
+ * @return {React.Component}
+ */
 function TimeProvider(props: React.PropsWithChildren) {
-  const [state, dispatch] = React.useReducer<
-    (
+  const [state, dispatch] = React.useReducer<(
       state: TimeProviderState,
       action: TimeProviderDispatchAction
-    ) => TimeProviderState
-  >(reducer, initialState);
+  ) => TimeProviderState
+      >(reducer, initialState);
 
   return (
     <TimeContext.Provider value={[state, dispatch]}>
@@ -209,18 +222,18 @@ function TimeProvider(props: React.PropsWithChildren) {
   );
 }
 
-const useTimeContext = function () {
+const useTimeContext = function() {
   return React.useContext(TimeContext);
 };
 
 
-const Time = function () {
+const Time = function() {
   return (
     <div>
       <TimeContext.Consumer>
         {([
           {
-            quiz: { time },
+            quiz: {time},
           },
         ]) => <div>Time: {time}</div>}
       </TimeContext.Consumer>
@@ -228,4 +241,4 @@ const Time = function () {
   );
 };
 
-export { TimeProvider, useTimeContext, Time };
+export {TimeProvider, useTimeContext, Time};
