@@ -16,7 +16,7 @@ import type {
 } from "./TimeProvider.d";
 
 const questions : TimeProviderQuestion[] = [
-  {
+/*  {
     type: "confirm",
     message:
       "Yes or No (Hint Yes):",
@@ -30,7 +30,7 @@ const questions : TimeProviderQuestion[] = [
     choices: ["A", "B", "C"],
     answer: ["A","B"],
     name: "checkbox",
-  },
+  }, */
   {
     type: "list",
     message: "Commonly used data types DO NOT include:",
@@ -114,7 +114,11 @@ function reducer(
       };
     }
     case START_QUIZ:
-      console.log("START_QUIZ", action.payload);
+      console.log("START_QUIZ");
+      if (!state.quiz.is.stopped) {
+        console.log("Already started!");
+        return state;
+      }
       return {
         ...state,
         quiz: {

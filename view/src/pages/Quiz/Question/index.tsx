@@ -7,8 +7,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import Button from "@mui/material/Button";
 
-import { SET_TIME, NEXT_QUESTION, TimeProviderQuestion } from "../../components/TimeProvider.d";
-import { useTimeContext } from "../../components/TimeProvider";
+import { SET_TIME, NEXT_QUESTION, TimeProviderQuestion } from "../../../components/TimeProvider.d";
+import { useTimeContext } from "../../../components/TimeProvider";
 import { Checkbox } from "@mui/material";
 import React from "react";
 
@@ -24,17 +24,21 @@ type AnswerProps = React.PropsWithChildren & {
   onAnswer?: (answer: { [key: string]: AnswerType }) => void;
 };
 
+function generateKey(prefix : string) {
+  return `${prefix}-${Date.now()}`;
+}
+
 function ListAnswers({ question, onAnswer }: AnswerProps) {
-  if (!question) {
+  if (!question?.choices) {
     return <></>;
   }
-
+  console.log("List: ",question);
   return (
     <FormControl>
       <FormLabel id="list-question">{question?.message ?? "ERROR: Question missing."}</FormLabel>
       <RadioGroup
         aria-labelledby="list-question"
-        name="list-controlled-radio-buttons-group"
+        name={question?.name}
         value={question?.default}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           onAnswer?.({ [question?.name]: e.target.value });
@@ -42,7 +46,7 @@ function ListAnswers({ question, onAnswer }: AnswerProps) {
       >
         {question?.choices.map(function (choice, index) {
           return (
-            <FormControlLabel key={index} value={index} control={<Radio />} label={choice} />
+            <FormControlLabel key={generateKey(`list-${index}`)} value={index} control={<Radio />} label={choice} />
           );
         })}
       </RadioGroup>
@@ -62,13 +66,14 @@ function ConfirmAnswers({ question, onAnswer }: AnswerProps) {
         name="confirm-controlled-radio-buttons-group"
         value={question?.default}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          console.log('ConfirmAnswers::onChange');
           onAnswer?.({ [question?.name]: e.target.value === "true" })
         }
         }
       >
         {[true, false].map(function (answer, index) {
           return (
-            <FormControlLabel key={index} value={answer} control={<Radio />} label={answer ? "Yes" : "No"} />
+            <FormControlLabel key={generateKey(`confirm-${index}`)} value={answer} control={<Radio />} label={answer ? "Yes" : "No"} />
           );
         })}
       </RadioGroup>
@@ -84,10 +89,11 @@ function CheckboxAnswers({ question, onAnswer }: AnswerProps) {
   }
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("CheckboxAnswers::onChange");
     setAnswers({
       ...answers,
-      [e.target.name]: e.target.checked
-    })
+      [e.target.name]: e.target.checked,
+    });
   };
 
   return (
@@ -95,7 +101,7 @@ function CheckboxAnswers({ question, onAnswer }: AnswerProps) {
       event.preventDefault();
 
       const answerArray = Object.entries(answers).filter(([, value]) => !!value).map(([key]) => key);
-      console.log("submit button", answerArray);
+      console.log("CheckboxAnswers::onSubmit", answerArray);
       onAnswer?.({ [question.name]: answerArray });
     }}>
       <FormControl>
@@ -105,7 +111,7 @@ function CheckboxAnswers({ question, onAnswer }: AnswerProps) {
         >
           {question?.choices?.map(function (choice, index) {
             return (
-              <FormControlLabel key={index} control={<Checkbox onChange={changeHandler} name={choice} />} label={choice} />
+              <FormControlLabel key={generateKey(`checkbox-${index}`)} control={<Checkbox onChange={changeHandler} name={choice} />} label={choice} />
             );
           })}
         </FormGroup>
@@ -120,6 +126,8 @@ function Question() {
   if (!quiz.question) {
     return <></>;
   }
+
+  console.log(quiz);
 
   let component: JSX.Element;
 

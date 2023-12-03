@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 import NavBar from "../../components/NavBar";
 import Question from "./Question";
@@ -6,26 +6,23 @@ import GameOver from "./GameOver";
 
 import useInterval from "../../components/useInterval";
 
-import { START_QUIZ, STOP_QUIZ, DECREMENT_TIME } from "../../components/TimeProvider.d";
+import { START_QUIZ, DECREMENT_TIME } from "../../components/TimeProvider.d";
 import { useTimeContext } from "../../components/TimeProvider";
 
 function Quiz() {
   const [{ quiz }, dispatch] = useTimeContext();
 
-  const clearInterval = useInterval(() => {
-    if (quiz.time < 1) {
-      clearInterval();
-      dispatch({ type: STOP_QUIZ });
-    } else if (!quiz.is.stopped) {
+  const cb = useCallback(() => {
+    if (!quiz.is.stopped) {
       dispatch({ type: DECREMENT_TIME });
     }
-  }, 1000, [ quiz.time, quiz.is.stopped ]);
+  },[quiz.is.stopped, dispatch]);
+
+  useInterval(cb, 1000);
 
   useEffect(() => {
     dispatch({ type: START_QUIZ });
-
-    return () => clearInterval();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>

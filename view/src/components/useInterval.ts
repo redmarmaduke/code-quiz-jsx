@@ -1,11 +1,10 @@
 import React from "react";
 
 export default function useInterval(
-  cb: () => undefined,
+  cb: () => void,
   ms: number = 1,
-  deps: React.DependencyList = []
 ) {
-  const handle = React.useRef<number | undefined>(undefined);
+  const handle = React.useRef<NodeJS.Timeout | undefined>(undefined);
   const msSinceEpoch = React.useRef<number>(Date.now().valueOf());
 
   // since args is an array, it's used to check that args contents haven't changed
@@ -16,17 +15,19 @@ export default function useInterval(
     const t = ms - ((msSinceEpochNow - msSinceEpoch.current) % ms);
 
     function handler() {
+      console.log("userInterval:handler()")
       msSinceEpoch.current = Date.now().valueOf();
       handle.current = setTimeout(handler, ms);
       cb();
     }
 
+    console.log("userInterval()")
     clearTimeout(handle.current);    
     handle.current = setTimeout(handler, t);
 
-    return () => { clearTimeout(handle.current); };
-  }, [ms, ...deps]);
+    return () => { clearTimeout(handle.current); console.log("interval unmounted")};
+  }, [cb, ms]);
 
   // memoize the callback so it's only recreated on props change
-  return () => { clearTimeout(handle.current); handle.current = undefined };
+  return () => { clearTimeout(handle.current); handle.current = undefined; console.log("interval explicitly stopped"); };
 }
