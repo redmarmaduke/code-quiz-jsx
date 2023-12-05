@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
+import {Link} from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import {
   TableContainer,
   Table,
@@ -10,21 +10,27 @@ import {
   TableBody,
   TableRow,
   TableCell,
-} from "@mui/material";
-import Title from "../components/Title";
+} from '@mui/material';
+import Title from '../components/Title';
 
-import { useTimeContext } from "../components/TimeProvider";
+import {useTimeContext} from '../components/TimeProvider';
 
+import generateKey from './Quiz/Question/generateKey';
+
+/**
+ * Highscores
+ * @return {JSX.Element}
+ */
 function Highscores() {
-  const [{ highscores }, dispatch] = useTimeContext();
+  const [{highscores}, dispatch] = useTimeContext();
   return (
     <div>
       <Title>High Scores</Title>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Stack spacing={3}>
@@ -40,7 +46,7 @@ function Highscores() {
               <TableBody>
                 {highscores.map((score, i) => {
                   return (
-                    <TableRow>
+                    <TableRow key={generateKey(`highscore-${i}`)}>
                       <TableCell>
                         {i+1}
                       </TableCell>
@@ -62,7 +68,7 @@ function Highscores() {
               component={Link}
               to="/"
               onClick={() => {
-                console.log("Go Back!");
+                console.log('Go Back!');
               }}
             >
               Go Back
@@ -70,7 +76,7 @@ function Highscores() {
             <Button
               variant="contained"
               onClick={() => {
-                dispatch({ type: "clear" });
+                dispatch({type: 'clear'});
               }}
             >
               Clear Game

@@ -6,62 +6,65 @@ import ConfirmAnswers from './ConfirmAnswers';
 
 import {useTimeContext} from '../../../components/TimeProvider';
 
-import {SET_TIME, NEXT_QUESTION} from '../../../components/TimeProvider.d';
+import {PASS_QUESTION, FAIL_QUESTION} from '../../../components/TimeProvider.d';
 import {AnswerValue} from './index.d';
 
 
 /**
  * Question Component
- * @return {React.Component}
+ * @return {JSX.Element}
  */
 function Question() {
-  const [{quiz}, dispatch] = useTimeContext();
-  if (!quiz.question) {
+  const [{quiz: {question = null}}, dispatch] = useTimeContext();
+  if (!question) {
     return <></>;
   }
 
-  console.log(quiz);
-
   let component: JSX.Element;
 
-  const name: string = quiz.question?.name;
+  const name: string = question?.name;
 
-  switch (quiz.question?.type) {
+  switch (question?.type) {
     case 'list':
       component = (
-        <ListAnswers question={quiz.question} onAnswer={(answer) => {
-          if (answer[name] !== quiz.question?.answer) {
-            dispatch({type: SET_TIME, payload: quiz.time - 10});
+        <ListAnswers question={question} onAnswer={(answer) => {
+          if (answer[name] != question?.answer) {
+            dispatch({type: FAIL_QUESTION});
+          } else {
+            dispatch({type: PASS_QUESTION});
           }
-          dispatch({type: NEXT_QUESTION});
         }} />
       );
       break;
     case 'confirm':
       component = (
-        <ConfirmAnswers question={quiz.question} onAnswer={(answer) => {
-          console.log(answer[name], name, quiz.question?.answer);
-          if (answer[name] !== quiz.question?.answer) {
-            dispatch({type: SET_TIME, payload: quiz.time - 10});
+        <ConfirmAnswers question={question} onAnswer={(answer) => {
+          if (answer[name] != question?.answer) {
+            dispatch({type: FAIL_QUESTION});
+          } else {
+            dispatch({type: PASS_QUESTION});
           }
-          dispatch({type: NEXT_QUESTION});
         }} />
       );
       break;
     case 'checkbox':
       component = (
-        <CheckboxAnswers question={quiz.question} onAnswer={(answer) => {
+        <CheckboxAnswers question={question} onAnswer={(answer) => {
           const sortCallback = (a: AnswerValue, b: AnswerValue) => {
             return JSON.stringify(a).localeCompare(JSON.stringify(b));
           };
 
-          const userAnswers: AnswerValue[] = answer[name] && answer[name] instanceof Array ? answer[name] as AnswerValue[] : [];
+          const userAnswers: AnswerValue[] =
+            answer[name] && answer[name] instanceof Array ?
+              answer[name] as AnswerValue[] :
+              [];
           if (userAnswers.length === 0) {
-            console.error('checkbox');
+            console.error('ERROR: checkbox question has no answers.');
           }
           userAnswers.sort(sortCallback);
 
-          const referenceAnswers = (quiz.question?.answer as AnswerValue[]).sort(sortCallback);
+          const referenceAnswers = (question?.answer as AnswerValue[]).
+              sort(sortCallback);
           // determine if all the checkboxes match?
           const isCorrect = userAnswers.every((value, index) => {
             return referenceAnswers[index] == value;
@@ -70,9 +73,10 @@ function Question() {
           // if all checkboxes do not match (ie. is not correct)
           // then penalize time
           if (!isCorrect) {
-            dispatch({type: SET_TIME, payload: quiz.time - 10});
+            dispatch({type: FAIL_QUESTION});
+          } else {
+            dispatch({type: PASS_QUESTION});
           }
-          dispatch({type: NEXT_QUESTION});
         }} />
       );
       break;

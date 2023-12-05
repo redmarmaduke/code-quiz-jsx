@@ -3,7 +3,8 @@ import {
   ADD_SCORE,
   START_QUIZ,
   STOP_QUIZ,
-  NEXT_QUESTION,
+  PASS_QUESTION,
+  FAIL_QUESTION,
   SET_TIME,
   DECREMENT_TIME,
 } from './TimeProvider.d';
@@ -113,6 +114,30 @@ function reducer(
       questionIndex: -1,
     },
   });
+  const decrementTime = (state: TimeProviderState, time: number) => {
+    return {
+      ...state,
+      quiz: {
+        ...state.quiz,
+        time: state.quiz.time - time,
+      },
+    };
+  };
+  const nextQuestion = (state: TimeProviderState) => {
+    if (state.quiz.questionIndex >= questions.length - 1) {
+      return stopQuiz(state);
+      // else increment question
+    } else {
+      return {
+        ...state,
+        quiz: {
+          ...state.quiz,
+          question: questions[state.quiz.questionIndex + 1],
+          questionIndex: state.quiz.questionIndex + 1,
+        },
+      };
+    }
+  };
 
   switch (action.type) {
     case ADD_SCORE: {
@@ -141,38 +166,33 @@ function reducer(
     case STOP_QUIZ:
       console.log('STOP QUIZ');
       return stopQuiz(state);
-    case NEXT_QUESTION:
-      console.log('NEXT QUESTION');
-      // if end of quiz the end
-      if (state.quiz.questionIndex >= questions.length - 1) {
-        return stopQuiz(state);
-        // else increment question
-      } else {
-        return {
-          ...state,
-          quiz: {
-            ...state.quiz,
-            question: questions[state.quiz.questionIndex + 1],
-            questionIndex: state.quiz.questionIndex + 1,
-          },
-        };
-      }
     case DECREMENT_TIME:
       console.log('DECREMENT_TIME');
       // if time then increment time
       if (state.quiz.time > 0) {
-        return {
-          ...state,
-          quiz: {
-            ...state.quiz,
-            time: state.quiz.time - 1,
-          },
-        };
+        return decrementTime(state, 1);
       } else {
         // else if time <= 0 then stop quiz
         return stopQuiz(state);
       }
+      break;
+    case FAIL_QUESTION:
+      console.log('FAIL_QUESTION');
+      {
+        state = decrementTime(state, 10);
+        state = nextQuestion(state);
+        return state;
+      }
+      break;
+    case PASS_QUESTION:
+      console.log('PASS_QUESTION');
+      {
+        state = nextQuestion(state);
+        return state;
+      }
+      break;
     case SET_TIME:
+      console.log('SET_TIME');
       if (typeof action.payload === 'number') {
         // immediately take appropriate action if time has been set to 0
         return {
@@ -185,6 +205,7 @@ function reducer(
       }
       return state;
     default:
+      console.log('DEFAULT');
       return state;
   }
 }
@@ -206,7 +227,7 @@ const TimeContext = React.createContext<
 /**
  * Time Provider
  * @param {React.PropsWithChildren} props
- * @return {React.Component}
+ * @return {JSX.Element}
  */
 function TimeProvider(props: React.PropsWithChildren) {
   const [state, dispatch] = React.useReducer<(

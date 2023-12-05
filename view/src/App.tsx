@@ -1,10 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Highscores from "./pages/Highscores";
-import Quiz from "./pages/Quiz/index";
-import { TimeProvider } from "./components/TimeProvider";
-import { GameProvider } from "./components/GameProvider";
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import Home from './pages/Home';
+import Highscores from './pages/Highscores';
+import Quiz from './pages/Quiz/index';
+import {TimeProvider} from './components/TimeProvider';
+import {GameProvider} from './components/GameProvider';
 
+/**
+ * App
+ * @return {JSX.Element}
+ */
 function App() {
   return (
     <div className="App">

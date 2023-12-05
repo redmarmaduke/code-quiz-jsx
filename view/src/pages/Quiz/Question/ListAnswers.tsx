@@ -13,22 +13,22 @@ import generateKey from './generateKey';
 /**
  * @param {TimeProviderQuestion} question
  * @param {function} onAnswer
- * @return {void}
+ * @return {JSX.Element}
  */
 export default function ListAnswers({question, onAnswer}: AnswerProps) {
   if (!question?.choices) {
     return <></>;
   }
-  console.log('List: ', question);
   return (
     <FormControl>
       <FormLabel id="list-question">
         {question?.message ?? 'ERROR: Question missing.'}
       </FormLabel>
+      {/* value must not be undefined else the component is uncontrolled */}
       <RadioGroup
         aria-labelledby="list-question"
         name={question?.name}
-        value={question?.default}
+        value={question?.default ?? ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           onAnswer?.({[question?.name]: e.target.value});
         }}

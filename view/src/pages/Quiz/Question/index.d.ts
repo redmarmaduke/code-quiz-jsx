@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimeProviderQuestion } from "../../../components/TimeProvider.d";
+import {TimeProviderQuestion} from '../../../components/TimeProvider.d';
 
 export type AnswerValue = string | number | boolean;
 export type AnswerType = AnswerValue | AnswerValue[] | undefined;

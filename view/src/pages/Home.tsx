@@ -1,11 +1,15 @@
-import { Link } from "react-router-dom";
+import {Link} from 'react-router-dom';
 
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
-import NavBar from "../components/NavBar";
-import Title from "../components/Title";
+import NavBar from '../components/NavBar';
+import Title from '../components/Title';
 
+/**
+ * Home Component
+ * @return {JSX.Element}
+ */
 function Home() {
   return (
     <div>
@@ -13,13 +17,13 @@ function Home() {
       <Stack
         spacing={1}
         display="flex"
-        justifyContent={"center"}
-        alignItems={"center"}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         <Title>Coding Quiz Challenge</Title>
         <div
           style={{
-            marginBottom: "1em",
+            marginBottom: '1em',
           }}
         >
           <p>
@@ -35,8 +39,8 @@ function Home() {
           variant="contained"
           component={Link}
           to="/quiz"
-          onClick={function () {
-            console.log("Start Quiz Button");
+          onClick={function() {
+            console.log('Start Quiz Button');
           }}
         >
           Start Quiz

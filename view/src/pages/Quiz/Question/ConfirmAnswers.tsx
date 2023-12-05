@@ -13,7 +13,7 @@ import generateKey from './generateKey';
 /**
  * @param {TimeProviderQuestion} question
  * @param {function} onAnswer
- * @return {void}
+ * @return {JSX.Element}
  */
 export default function ConfirmAnswers({question, onAnswer}: AnswerProps) {
   if (!question) {
@@ -24,12 +24,12 @@ export default function ConfirmAnswers({question, onAnswer}: AnswerProps) {
       <FormLabel id="confirm-question">
         {question?.message ?? 'ERROR: Question missing.'}
       </FormLabel>
+      {/* value cannot be undefined else radiogroup will be uncontrolled */}
       <RadioGroup
         aria-labelledby="confirm-question"
         name="confirm-controlled-radio-buttons-group"
-        value={question?.default}
+        value={question?.default ?? ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          console.log('ConfirmAnswers::onChange');
           onAnswer?.({[question?.name]: e.target.value === 'true'});
         }
         }
