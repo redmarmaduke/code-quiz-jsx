@@ -10,11 +10,15 @@ import {GameProvider} from './components/GameProvider';
  * @return {JSX.Element}
  */
 function App() {
+  console.log(import.meta.env.PROD ? import.meta.env.BASE_URL : '/');
   return (
     <div className="App">
       <TimeProvider>
         <GameProvider>
-          <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <BrowserRouter basename={
+            import.meta.env.MODE === 'production' ?
+              import.meta.env.BASE_URL : ''
+          }>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/highscores" element={<Highscores />} />

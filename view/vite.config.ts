@@ -9,7 +9,7 @@ export default defineConfig(({command, mode}) => {
       open: true,
       port: 5173,
     },
-    base: mode !== 'production' ? '/code-quiz-jsx/' : './',
+    base: mode === 'production' ? '/code-quiz-jsx/' : './',
     plugins: [react()],
   };
 });
