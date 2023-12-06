@@ -2,7 +2,7 @@
 name: Deploy static content to Pages
 
 env:
-  NODE_ENV: production
+  NODE_ENV: production 
 
 on:
   # Runs on pushes targeting the default branch
