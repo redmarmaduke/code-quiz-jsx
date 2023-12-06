@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",    
+    "dev": "vite",
     "build:prod": "tsc && vite build",
     "build:dev": "tsc && vite build --mode development",
     "build": "if-env NODE_ENV=\"production\" && npm run build:prod || npm run build:dev",
@@ -29,7 +29,7 @@
     "@babel/preset-env": "^7.23.5",
     "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
-    "@types/jest": "^29.5.10",
+    "@types/jest": "^29.5.11",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
