@@ -15,5 +15,6 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'spaced-comment': ["error", "always", { "markers": ["/"] }],
   },
 }
